@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cli/commandHandlers/ICommandHandler.h"
+#include "utils/Logger.h"
 #include <string>
 #include <iostream>
 #include <vector>

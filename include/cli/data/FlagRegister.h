@@ -19,6 +19,7 @@ namespace cli {
 
 	inline const std::vector<FlagInfo>& getFlagInfo() {
 		static std::vector<FlagInfo> flagInfoList = {
+			{"-v", "--verbose", FlagType::None},
 			{"-m", "--message", FlagType::Required},
 			{"-p", "--path", FlagType::Required},
 			{"-r", "--recursive", FlagType::None}

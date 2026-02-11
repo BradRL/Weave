@@ -2,9 +2,7 @@
 
 namespace cli
 {
-	cli::Parser::Parser(const std::vector<std::string>& tk) : tokens(tk) {
-		
-	}
+	cli::Parser::Parser(const std::vector<std::string>& tk) : tokens(tk) {}
 
 	cli::ParsedCommand cli::Parser::parse() {
 		cli::ParsedCommand result;  // new ParsedCommand object to write to
@@ -13,7 +11,7 @@ namespace cli
 		result.programPath = std::filesystem::canonical(tokens[0]);  // Absolute path to `Weave.exe` on disk.
 
 		if (tokens.size() == 1) {
-			std::cout << "Debug: No command provided." << std::endl;
+			utils::log("<Error> | Parser::parse() > 'No command provided'");
 			result.command = "N/A";
 			return result;  // Return an invalid ParsedCommand
 		} 
@@ -25,13 +23,16 @@ namespace cli
 		{
 			std::string token = tokens[i];
 
-			if (longFlagMap.contains(token)) {
+			if (longFlagMap.contains(token)) 
+			{
+				if (token == "--verbose") { utils::enable(); }  // Enable logging if verbose flag is present
+
 				cli::FlagInfo flagInfo = longFlagMap[token];
 				if (flagInfo.type == cli::FlagType::Required) 
 				{
 					++i;
 					if (i >= tokens.size()) {
-						std::cout << "Debug: Expected value for flag '" << token << "' not provided." << std::endl;
+						utils::log("<Error> | Parser::parse() > 'Expected value for flag '" + token + "' not provided.'");
 						return result;  // Return an invalid ParsedCommand
 					}
 					else {
@@ -46,12 +47,14 @@ namespace cli
 
 			else if (shortFlagMap.contains(token)) 
 			{
+				if (token == "-v") { utils::enable(); }  // Enable logging if verbose flag is present
+
 				cli::FlagInfo flagInfo = shortFlagMap[token];
 				if (flagInfo.type == cli::FlagType::Required) 
 				{
 					++i;
 					if (i >= tokens.size()) {
-						std::cout << "Debug: Expected value for flag '" << token << "' not provided." << std::endl;
+						utils::log("<Error> | Parser::parse() > 'Expected value for flag '" + token + "' not provided.'");
 						return result;  // Return an invalid ParsedCommand
 					}
 					else {

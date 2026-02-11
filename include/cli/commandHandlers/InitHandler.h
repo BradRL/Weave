@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cli/commandHandlers/ICommandHandler.h"
+#include "utils/Logger.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -20,8 +21,8 @@ namespace cli {
 		/// <summary>
 		/// Validates command arguments and flags.
 		/// 
-		/// Command syntax: `weave init [path/to/dir]`
-		/// Args: [path/to/dir] - optional argument specifying directory to initialize repository in (defaults to invocation path if not provided).
+		/// Command syntax: `weave init <repository name>`
+		/// Args: <repository name> required parameter, sets the repo's name for easy identification. directory path is assumed to be same as invocation path.
 		/// Flags: None.
 		/// </summary>
 		bool validate();

@@ -6,6 +6,7 @@ namespace cli
 		auto handler = commandMap.find(cmd.command);  // itterates through map of handlers
 
 		if (handler == commandMap.end()) {
+			utils::log("<Error> | Dispatcher::dispatch() > `Command '" + cmd.command + "' not found.`");
 			return false;  // command not found (return false to indicate issue)
 		}
 

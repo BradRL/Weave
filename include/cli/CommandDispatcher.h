@@ -3,9 +3,10 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "ParsedCommand.h"
+#include "cli/data/ParsedCommand.h"
 #include "commandHandlers/ICommandHandler.h"
 #include "cli/data/CommandRegister.h"
+#include "utils/Logger.h"
 
 namespace cli {
 

@@ -4,8 +4,9 @@
 #include <vector>
 #include <unordered_map>
 #include <filesystem>
-#include "ParsedCommand.h"
+#include "cli/data/ParsedCommand.h"
 #include "cli/data/FlagRegister.h"
+#include "utils/Logger.h"
 
 namespace cli {
  	
