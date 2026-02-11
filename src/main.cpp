@@ -1,10 +1,13 @@
 #include "cli/CommandParser.h"
 #include "cli/CommandDispatcher.h"
 #include <iostream>
+#include <filesystem>
 
 int main(int argc, char* argv[]) {
 
 	std::cout << "Starting CLI application..." << std::endl;
+
+	std::filesystem::current_path();
 
 	// cli tokens to vector
 	std::vector<std::string> tokens(argv, argv + argc);
@@ -17,6 +20,7 @@ int main(int argc, char* argv[]) {
 	// attempts to parse given command from CLI
 	cli::ParsedCommand parsedCommand = parser.parse();
 
+	std::cout << "'CommandParser' > DEBUG program path : " << parsedCommand.programPath << std::endl;
 	std::cout << "`CommandParser` > DEBUG invocation path : " << parsedCommand.invocationPath << std::endl;
 	std::cout << "`CommandParser` > DEBUG command type : " << parsedCommand.command << std::endl;
 	for (std::string s : parsedCommand.args) {

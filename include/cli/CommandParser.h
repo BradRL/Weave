@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <filesystem>
 #include "ParsedCommand.h"
 #include "cli/data/FlagRegister.h"
 

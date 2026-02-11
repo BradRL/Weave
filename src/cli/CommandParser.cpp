@@ -9,7 +9,8 @@ namespace cli
 	cli::ParsedCommand cli::Parser::parse() {
 		cli::ParsedCommand result;  // new ParsedCommand object to write to
 		
-		result.invocationPath = tokens[0];  // Path `Weave.exe` was called from.
+		result.invocationPath = std::filesystem::current_path();  // Absolute path to the directory `Weave.exe` was called from.
+		result.programPath = std::filesystem::canonical(tokens[0]);  // Absolute path to `Weave.exe` on disk.
 
 		if (tokens.size() == 1) {
 			std::cout << "Debug: No command provided." << std::endl;

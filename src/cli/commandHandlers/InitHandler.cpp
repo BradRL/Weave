@@ -9,14 +9,19 @@ namespace cli {
 			return;  // Exit if validation fails
 		}
 
-		std::string directoryPath;
+		std::filesystem::path repoPath;
 
 		if (commandData.args.size() == 1) {
-			directoryPath = commandData.args[0];  // Use provided directory path
+			try {
+				repoPath = std::filesystem::canonical(commandData.args[0]);
+			} catch (const std::filesystem::filesystem_error& e) {
+				std::cout << "`InitHandler` > ERROR `Execute()' - Invalid path provided: " << e.what() << std::endl;
+				return;  // Exit if the provided path is invalid
+			}
 		} 
 		else 
 		{
-			directoryPath = commandData.invocationPath;  // Default to invocation path
+			repoPath = commandData.invocationPath;  // Default to invocation path
 		}
 
 		std::cout << "InitHandler` > DEBUG `Execute()' - Command pass." << std::endl;

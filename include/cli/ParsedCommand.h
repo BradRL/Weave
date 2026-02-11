@@ -4,10 +4,13 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <filesystem>
 
 namespace cli {
 struct ParsedCommand {	
-	std::string invocationPath;  // Path `Weave.exe` was called from.
+
+	std::filesystem::path invocationPath;  // Path `Weave.exe` was called from.
+	std::filesystem::path programPath;     // Absolute path to `Weave.exe` on disk.
 
 	/// <summary>
 	/// Command name to be executed (e.g. "commit", "init").
