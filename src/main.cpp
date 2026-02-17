@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!parsedCommand.valid) {
-		utils::log("<Error> | main() > `Invalid command syntax, terminating program...`");
+		utils::logError("<Error> | main() > `Invalid command syntax, terminating program...`");
 		utils::displayLogs();
 		return 1;
 	}

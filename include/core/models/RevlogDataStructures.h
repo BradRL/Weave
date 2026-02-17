@@ -21,8 +21,6 @@ namespace revlog {
         int32_t baseRev;            // base revision for delta (usually itself for changelog)
         int32_t linkRev;            // revision number (self for changelog)
 
-		std::string branchName;         // branch name (empty string for changelog)
-
         int32_t parent1;            // first parent commit rev
         int32_t parent2;            // second parent (-1 if none)
 
@@ -33,18 +31,19 @@ namespace revlog {
     /// Represents a changelog entry (commit).
     /// </summary>
     struct ChangelogDataEntry {
-        std::string manifest_node_id;    // Node ID of the manifest associated with this changelog entry
+        std::array<uint8_t, 32> manifestNodeId;  // Node ID of the manifest associated with this changelog entry
         std::string author;              // Author of the change
         time_t timestamp;           // Timestamp of the change
-        std::string commit_message;      // Commit message describing the change
+        std::string commitMessage;      // Commit message describing the change
+        std::string branchName;
     };
 
     /// <summary>
     /// Represents a single file entry in the manifest.
     /// </summary>
     struct ManifestFileEntry {
-    std::string filePath;        // Path of the file in the manifest
-    std::string nodeID;          // Node ID (hash) of the file content
+        std::string filePath; // Path of the file in the manifest
+        std::array<uint8_t, 32> manifestNodeId;  // Node ID (hash) of the file content
     };
 
     /// <summary>

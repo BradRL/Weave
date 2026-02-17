@@ -2,26 +2,31 @@
 
 namespace cli {
 
-	void cli::InitHandler::execute() {
+	void cli::InitHandler::execute() 
+	{
 
-		if (!validate()) {
+		if (!validateCommand()) {
 			return;  // Exit if validation fails
 		}
 
-		std::filesystem::path repoPath = commandData.invocationPath;  // Default repository path is the invocation path
-		std::string repoName = commandData.args[0];  // Repository name from the first argument
+		utils::log("<Debug> | InitHandler::execute() > `Command pass`");
 
-		utils::log("<debug> | InitHandler::execute() > `Command pass`");
+		revlog::RepoInitializer repoInitializer = revlog::RepoInitializer::RepoInitializer(commandData);
+		
+		repoInitializer.initializeRepository();
+
+		std::cout << ("[Weave] INFO | Init: Repository initialized.") << std::endl;
 	}
 
-	bool cli::InitHandler::validate() {
+	bool cli::InitHandler::validateCommand() 
+	{
 
 		if (commandData.args.size() == 0) {
-			utils::log("<Error> | InitHandler::validate() > `<Repository Name> argument is required.`");
+			utils::logError("<Error> | InitHandler::validateCommand() > `<Repository Name> argument is required.`");
 			return false;  // Invalid if no args provided
 		}
 		else if (commandData.args.size() > 1) {
-			utils::log("<Error> | InitHandler::validate() > `Too many arguments provided.`");
+			utils::logError("<Error> | InitHandler::validateCommand() > `Too many arguments provided.`");
 			return false;  // Invalid if more than one argument is provided
 		}
 		
@@ -30,9 +35,13 @@ namespace cli {
 			{
 				continue;  // Skip validation for verbose flag 
 			}  
+			else if (key == "-a" || key == "--author") 
+			{
+				continue;
+			}
 			else
 			{
-				utils::log("<Error> | InitHandler::validate() > `Invalid flag '" + key + "' provided.`");
+				utils::logError("<Error> | InitHandler::validateCommand() > `Invalid flag '" + key + "' provided.`");
 				return false;  // Invalid if any flags other than verbose are provided
 			}
 		}
@@ -40,7 +49,8 @@ namespace cli {
 		return true;
 	}
 
-	void cli::InitHandler::set(const ParsedCommand& cmd) {
+	void cli::InitHandler::set(const ParsedCommand& cmd) 
+	{
 		commandData = cmd;
 	}
 }

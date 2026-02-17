@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -13,25 +14,38 @@ namespace utils {
 
 	private:
 		inline static std::vector<std::string> logHistory = {};  // Static vector to store log history
+		inline static std::vector<std::string> errorHistory = {};  // Static vector to store error history
 
 		inline static bool enabled = false;  // Flag to enable/disable logging (can be toggled with `-v / --verbose`)
+		inline static bool hasErrors = false;  // Flag to indicate if any errors have been logged
 
 	public:
 
 		/// <summary>
 		/// Adds a log entry to the log history list
 		/// </summary>
-		void Log(const std::string& logEntry) {
+		void log(const std::string& logEntry) {
 			logHistory.push_back(logEntry);
+		}
+
+		void logError(const std::string& errorEntry) {
+			errorHistory.push_back(errorEntry);
+			hasErrors = true;
 		}
 
 		/// <summary>
 		/// Displays the log history to the console. Can be used for debugging or informational purposes. (use `-v / --verbose`).
 		/// </summary>
 		void displayLog() {
-			if (!enabled) { return; }
+			if (!enabled || hasErrors) { return; }
 
 			for (const auto& entry : logHistory) {
+				std::cout << entry << std::endl;
+			}
+		}
+
+		void displayErrorLog() {
+			for (const std::string& entry : errorHistory) {
 				std::cout << entry << std::endl;
 			}
 		}
@@ -45,11 +59,16 @@ namespace utils {
 
 	// Global access function for logging messages
 	inline void log(const std::string& message) {
-		gLogger.Log(message);
+		gLogger.log(message);
+	}
+
+	inline void logError(const std::string& errorMessage) {
+		gLogger.logError(errorMessage);
 	}
 
 	inline void displayLogs() {
 		gLogger.displayLog();
+		gLogger.displayErrorLog();
 	}
 
 	inline void enable() {

@@ -2,6 +2,7 @@
 
 #include "cli/commandHandlers/ICommandHandler.h"
 #include "utils/Logger.h"
+#include "core/revlog/RepoInitializer.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -25,7 +26,7 @@ namespace cli {
 		/// Args: <repository name> required parameter, sets the repo's name for easy identification. directory path is assumed to be same as invocation path.
 		/// Flags: None.
 		/// </summary>
-		bool validate();
+		bool validateCommand();
 
 		/// <summary>
 		/// Sets command arguments.
