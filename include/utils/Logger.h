@@ -37,7 +37,7 @@ namespace utils {
 		/// Displays the log history to the console. Can be used for debugging or informational purposes. (use `-v / --verbose`).
 		/// </summary>
 		void displayLog() {
-			if (!enabled || hasErrors) { return; }
+			if (!enabled) { return; }
 
 			for (const auto& entry : logHistory) {
 				std::cout << entry << std::endl;

@@ -2,7 +2,7 @@
 
 #include "cli/commandHandlers/ICommandHandler.h"
 #include "utils/Logger.h"
-#include "core/init/InitService.h"
+#include "core/commandServices/InitService.h"
 #include <string>
 #include <iostream>
 #include <vector>
