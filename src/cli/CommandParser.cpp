@@ -11,7 +11,7 @@ namespace cli
 		result.programPath = std::filesystem::canonical(tokens[0]);  // Absolute path to `Weave.exe` on disk.
 
 		if (tokens.size() == 1) {
-			utils::logError("<Error> | Parser::parse() > 'No command provided'");
+			utils::logError("[Weave] ERROR | No command provided");
 			result.command = "N/A";
 			return result;  // Return an invalid ParsedCommand
 		} 
@@ -32,7 +32,7 @@ namespace cli
 				{
 					++i;
 					if (i >= tokens.size()) {
-						utils::logError("<Error> | Parser::parse() > 'Expected value for flag '" + token + "' not provided.'");
+						utils::logError("[Weave] ERROR | Argument not provided for flag '" + token + "'");
 						return result;  // Return an invalid ParsedCommand
 					}
 					else {
@@ -54,7 +54,7 @@ namespace cli
 				{
 					++i;
 					if (i >= tokens.size()) {
-						utils::logError("<Error> | Parser::parse() > 'Expected value for flag '" + token + "' not provided.'");
+						utils::logError("[Weave] ERROR | Argument not provided for flag '" + token + "'");
 						return result;  // Return an invalid ParsedCommand
 					}
 					else {

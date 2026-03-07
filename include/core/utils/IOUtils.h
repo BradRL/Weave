@@ -35,4 +35,8 @@ namespace utils {
 	/// </summary>
 	/// <returns></returns>
 	std::filesystem::path getWeaveRoot();
+
+	bool repoExistsFromInvocationPath(const std::filesystem::path& invocationPath);
+
+	std::string repoNameFromInvocationPath(const std::filesystem::path& invocationPath);
 }

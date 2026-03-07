@@ -53,6 +53,8 @@ namespace utils {
 		return configStruct;
 	}
 
+
+
 	std::filesystem::path getWeaveRoot() 
 	{
 		const char* localAppData = std::getenv("LOCALAPPDATA");
@@ -64,5 +66,39 @@ namespace utils {
 
 		std::filesystem::create_directories(root); 
 		return root;
+	}
+
+	bool repoExistsFromInvocationPath(const std::filesystem::path& invocationPath) 
+	{
+		std::filesystem::path programRepoPath = getWeaveRoot();
+
+		for (const auto& eachPath : std::filesystem::directory_iterator(programRepoPath))
+		{
+			utils::repoConfig repoConfig = utils::readConfig(eachPath.path() / ".weave" / "config");
+
+			if (repoConfig.root == invocationPath) 
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	std::string repoNameFromInvocationPath(const std::filesystem::path& invocationPath) 
+	{
+		std::filesystem::path programRepoPath = getWeaveRoot();
+
+		for (const auto& eachPath : std::filesystem::directory_iterator(programRepoPath))
+		{
+			utils::repoConfig repoConfig = utils::readConfig(eachPath.path() / ".weave" / "config");
+
+			if (repoConfig.root == invocationPath)
+			{
+				return repoConfig.name;
+			}
+		}
+
+		return "";
 	}
 }

@@ -3,6 +3,7 @@
 // Include command handler headers here
 #include "cli/commandHandlers/TestHandler.h"
 #include "cli/commandHandlers/InitHandler.h"
+#include "cli/commandHandlers/AddHandler.h"
 
 namespace cli {
 
@@ -10,6 +11,7 @@ namespace cli {
 		static std::unordered_map<std::string, ICommandHandler*> commandMap;
 		commandMap["test"] = new TestHandler();
 		commandMap["init"] = new InitHandler();
+		commandMap["add"] = new AddHandler();
 		return commandMap;
 	}
 }

@@ -1,10 +1,10 @@
-#include "core/revlog/RepoInitializer.h"
+#include "core/init/InitService.h"
 
-namespace revlog {
+namespace init {
 
-	revlog::RepoInitializer::RepoInitializer(const cli::ParsedCommand& cmd) : commandData(cmd) {}
-	
-	void revlog::RepoInitializer::initializeRepository()
+	init::InitService::InitService(const cli::ParsedCommand& cmd) : commandData(cmd) {}
+
+	void init::InitService::initializeRepository()
 	{
 		if (!validateInitializeRepository()) { return; }
 
@@ -12,11 +12,12 @@ namespace revlog {
 
 		createRepoLayout(root);
 		createConfigFile(root);
+		createStageFile(root);
 		createChangelogFiles(root);
 		createManifestFiles(root);
 	}
 
-	bool revlog::RepoInitializer::validateInitializeRepository()
+	bool init::InitService::validateInitializeRepository()
 	{
 		std::string repoName = commandData.args[0];
 		std::filesystem::path configPath = commandData.invocationPath;
@@ -28,7 +29,7 @@ namespace revlog {
 			// Checks if repository with same name already exists.
 			if (utils::isSameOrSubdir(eachPath, targetRepoPath))
 			{
-				utils::logError("<Error> | InitHandler::validateInitializeRepository() > 'Repository named `" + repoName + "` aready exists'");
+				utils::logError("[Init] ERROR | Repository named `" + repoName + "` aready exists");
 				return false;
 			}
 
@@ -37,7 +38,7 @@ namespace revlog {
 
 			if (utils::isSameOrSubdir(repoConfig.root, configPath))
 			{
-				utils::logError("<Error> | InitHandler::validateInitializeRepository() > 'Repository location overlaps with existing repository'");
+				utils::logError("[Init] ERROR | Repository location overlaps with existing repository");
 				return false;
 			}
 		}
@@ -45,17 +46,17 @@ namespace revlog {
 		return true;
 	}
 
-	void revlog::RepoInitializer::createRepoLayout(const std::filesystem::path& root) 
+	void init::InitService::createRepoLayout(const std::filesystem::path& root)
 	{
 		std::filesystem::create_directories(root / commandData.args[0] / ".weave" / "store" / "data");
 	}
 
-	void revlog::RepoInitializer::createConfigFile(const std::filesystem::path& root) 
+	void init::InitService::createConfigFile(const std::filesystem::path& root)
 	{
 		std::ofstream configFile(root / commandData.args[0] / ".weave" / "config");
 
 		std::time_t now = std::time(nullptr);
-		std::tm tm = *std::localtime(&now); 
+		std::tm tm = *std::localtime(&now);
 
 		char timeStr[20];
 		std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M", &tm);
@@ -67,10 +68,10 @@ namespace revlog {
 		configFile << "root=" << commandData.invocationPath.string() << std::endl;
 		configFile << "created=" << timeStr << std::endl;
 
-		if (commandData.flags.contains("-a")) 
+		if (commandData.flags.contains("-a"))
 		{
 			configFile << "author=" << commandData.flags["-a"] << std::endl;
-		} 
+		}
 		else if (commandData.flags.contains("--author"))
 		{
 			configFile << "author=" << commandData.flags["--author"] << std::endl;
@@ -83,7 +84,13 @@ namespace revlog {
 		configFile.close();
 	}
 
-	void revlog::RepoInitializer::createChangelogFiles(const std::filesystem::path& root) 
+	void init::InitService::createStageFile(const std::filesystem::path& root) 
+	{
+		std::ofstream stageFile(root / commandData.args[0] / ".weave" / "stage");
+		stageFile.close();
+	}
+
+	void init::InitService::createChangelogFiles(const std::filesystem::path& root)
 	{
 		std::ofstream changelogFileD(root / commandData.args[0] / ".weave" / "store" / "changelog.d");
 		changelogFileD.close();
@@ -92,7 +99,7 @@ namespace revlog {
 		changelogFileI.close();
 	}
 
-	void revlog::RepoInitializer::createManifestFiles(const std::filesystem::path& root) 
+	void init::InitService::createManifestFiles(const std::filesystem::path& root)
 	{
 		std::ofstream manifestFileD(root / commandData.args[0] / ".weave" / "store" / "manifest.d");
 		manifestFileD.close();

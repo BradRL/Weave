@@ -9,31 +9,32 @@ namespace cli {
 			return;  // Exit if validation fails
 		}
 
-		utils::log("<Debug> | InitHandler::execute() > `Command pass`");
-
-		revlog::RepoInitializer repoInitializer = revlog::RepoInitializer::RepoInitializer(commandData);
+		init::InitService initService = init::InitService::InitService(commandData);
 		
-		repoInitializer.initializeRepository();
+		initService.initializeRepository();
 
-		std::cout << ("[Weave] INFO | Init: Repository initialized.") << std::endl;
+		utils::log("[Init] INFO | Initialized repository '" + commandData.args[0] + "'");
 	}
 
 	bool cli::InitHandler::validateCommand() 
 	{
 
-		if (commandData.args.size() == 0) {
-			utils::logError("<Error> | InitHandler::validateCommand() > `<Repository Name> argument is required.`");
+		if (commandData.args.size() == 0) 
+		{
+			utils::logError("[Init] ERROR | Required argument '<Repository Name>' not provided");
 			return false;  // Invalid if no args provided
 		}
-		else if (commandData.args.size() > 1) {
-			utils::logError("<Error> | InitHandler::validateCommand() > `Too many arguments provided.`");
+		else if (commandData.args.size() > 1) 
+		{
+			utils::logError("[Init] ERROR | Too many arguments provided");
 			return false;  // Invalid if more than one argument is provided
 		}
 		
-		for (const auto& [key, value] : commandData.flags) {
+		for (const auto& [key, value] : commandData.flags) 
+		{
 			if (key == "-v" || key == "--verbose")
 			{
-				continue;  // Skip validation for verbose flag 
+				continue;  
 			}  
 			else if (key == "-a" || key == "--author") 
 			{
@@ -41,7 +42,7 @@ namespace cli {
 			}
 			else
 			{
-				utils::logError("<Error> | InitHandler::validateCommand() > `Invalid flag '" + key + "' provided.`");
+				utils::logError("[Init] ERROR | Invalid flag '" + key + "' provided");
 				return false;  // Invalid if any flags other than verbose are provided
 			}
 		}

@@ -20,7 +20,7 @@ namespace cli {
         /// Sets command arguments.
         /// </summary>
         /// <param name="cmd :">`ParsedCommand` struct of parsed args and flags.</param>
-        virtual void set(const ParsedCommand& cmd);
+        void set(const ParsedCommand& cmd);
 
     protected:
         cli::ParsedCommand commandData;

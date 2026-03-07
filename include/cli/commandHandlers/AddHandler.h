@@ -2,7 +2,7 @@
 
 #include "cli/commandHandlers/ICommandHandler.h"
 #include "utils/Logger.h"
-#include "core/init/InitService.h"
+#include "core/add/AddService.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -10,7 +10,7 @@
 
 namespace cli {
 
-	class InitHandler : public ICommandHandler {
+	class AddHandler : public ICommandHandler {
 
 	public:
 
@@ -22,9 +22,9 @@ namespace cli {
 		/// <summary>
 		/// Validates command arguments and flags.
 		/// 
-		/// Command syntax: `weave init <repository name>`
-		/// Args: <repository name> required parameter, sets the repo's name for easy identification. directory path is assumed to be same as invocation path.
-		/// Flags: Author - sets repo author name (local user by default).
+		/// Command syntax: `weave add <file> [file(s)]`
+		/// Args: <file> mandatory parameter, adds this file. [file(s)] optional parameters for additional files. files can include paths
+		/// Flags: None.
 		/// </summary>
 		bool validateCommand();
 

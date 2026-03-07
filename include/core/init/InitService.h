@@ -9,10 +9,10 @@
 #include <vector>
 #include <filesystem>
 
-namespace revlog {
+namespace init {
 
-	class RepoInitializer {
-		
+	class InitService {
+
 	private:
 		cli::ParsedCommand commandData;
 
@@ -36,6 +36,12 @@ namespace revlog {
 		void createConfigFile(const std::filesystem::path& root);
 
 		/// <summary>
+		/// Creates an empty file for file staging
+		/// </summary>
+		/// <param name="root"></param>
+		void createStageFile(const std::filesystem::path& root);
+
+		/// <summary>
 		/// Creates changelog file for the repository and an initial (empty) commit.
 		/// </summary>
 		/// <param name="root"></param>
@@ -48,7 +54,7 @@ namespace revlog {
 		void createManifestFiles(const std::filesystem::path& root);
 
 	public:
-		RepoInitializer(const cli::ParsedCommand& cmd);
+		InitService(const cli::ParsedCommand& cmd);
 
 		/// <summary>
 		/// Initializes a new `Weave` repository, point of access.
