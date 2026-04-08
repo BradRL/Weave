@@ -36,6 +36,10 @@ namespace cli {
 			}
 			else if (key == "-r" || key == "--recursive")
 			{
+				continue;  // NOT YET IMPLEMENTED, LOW PRIORITY
+			}
+			else if (key == "-t" || key == "--tracked") 
+			{
 				continue;
 			}
 			else

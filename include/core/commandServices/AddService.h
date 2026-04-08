@@ -52,16 +52,13 @@ namespace add {
 		void appendRevision();
 
 		/// <summary>
-		/// Checks if a file with the same content (nodeID) is already staged, to prevent duplicates in staging and revlog files.
-		/// </summary>
-		/// <param name="nodeID">current hash nodeID</param>
-		/// <returns>is that ID is present in staging</returns>
-		bool isFileStaged(const std::array<uint8_t, 32>& nodeID);
-
-		/// <summary>
 		/// Adds staged file data to staging file, which is used as a temporary storage for files to be commited, until commit is made and stage is cleared. also adds file to revlog files.
 		/// </summary>
 		void updateStage();
+
+		bool hasRevision() const;
+
+		void tryUpdateStage();
 
 	public:
 		AddService(const cli::ParsedCommand& cmd);

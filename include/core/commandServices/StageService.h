@@ -10,21 +10,17 @@
 #include <vector>
 #include <filesystem>
 
-namespace rm {
+namespace stage {
 
-	class RemoveService {
+	class StageService {
 
 	private:
 		cli::ParsedCommand commandData;
-		std::string fileName;  // use as global accessor instead of passing down
 		std::filesystem::path stageFilePath;
 
-	private:
-		bool updateStage();
-		void removeTracking(const std::string& file);
-
 	public:
-		RemoveService(const cli::ParsedCommand& cmd);
-		bool removeFile(const std::string& file);
+		StageService(const cli::ParsedCommand& cmd);
+
+		void viewStage();
 	};
 }

@@ -14,16 +14,11 @@ namespace add {
 
 		createStageData();
 
-		if (!isFileStaged(fileIndexEntry.nodeID))
-		{
+		if (!hasRevision()) {
 			appendRevision();
-			updateStage();
 			utils::log("[Add] INFO | Added File '" + filePath.string() + "' to staging");
 		}
-		else
-		{
-			utils::logError("[Add] ERROR | File '" + filePath.string() + "' already staged");
-		}
+		tryUpdateStage();
 
 		return true;
 	}
@@ -152,25 +147,6 @@ namespace add {
 		indexFile.close();
 	}
 
-	bool add::AddService::isFileStaged(const std::array<uint8_t, 32>& nodeID)
-	{
-		std::ifstream stageFile(stageFilePath, std::ios::binary);
-
-		models::stageEntyDisk disk{};
-
-		while (stageFile.read(reinterpret_cast<char*>(&disk), sizeof(models::stageEntyDisk)))
-		{
-			if (disk.nodeID == nodeID)
-			{
-				return true;
-			}
-		}
-
-		stageFile.close();
-
-		return false;
-	}
-
 	void add::AddService::updateStage() {
 		std::ofstream stageFile(stageFilePath, std::ios::binary | std::ios::app);
 
@@ -182,9 +158,80 @@ namespace add {
 			std::min(fileIndexEntry.path.size(), disk.path.size() - 1)
 		);
 		disk.nodeID = fileIndexEntry.nodeID;
+		disk.flags = 1; // 1 is add, 0 is delete
 
 		stageFile.write(reinterpret_cast<const char*> (&disk), sizeof(models::stageEntyDisk));
 
 		stageFile.close();
+	}
+
+	bool add::AddService::hasRevision() const {
+		std::ifstream targetFile(indexFilePath, std::ios::binary);
+
+		if (!targetFile.is_open())
+			return false;
+
+		models::FileIndexEntryDisk disk{};
+
+		while (targetFile.read(reinterpret_cast<char*>(&disk), sizeof(models::FileIndexEntryDisk)))
+		{
+			if (disk.nodeID == fileIndexEntry.nodeID)
+			{
+				targetFile.close();
+				utils::log("[Add] INFO | File '" + filePath.string() + "' found previous revision");
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void add::AddService::tryUpdateStage() {
+		bool rewrite = false;
+
+		std::ifstream stageFile(stageFilePath, std::ios::binary);
+
+		models::stageEntyDisk disk{};
+		std::vector<models::stageEntyDisk> stageEntries;
+
+		while (stageFile.read(reinterpret_cast<char*>(&disk), sizeof(models::stageEntyDisk)))
+		{
+			std::string pathStr(reinterpret_cast<char*>(disk.path.data()));
+
+			if (pathStr == fileName)
+			{
+				if (disk.flags == 0) {
+					rewrite = true;
+					utils::log("[Add] INFO | File '" + filePath.string() + "' was staged for removal, now re-adding");
+					continue;
+				}
+
+				if (disk.nodeID == fileIndexEntry.nodeID) 
+				{
+					utils::logError("[Add] ERROR | File '" + filePath.string() + "' already staged");
+					return;
+				}
+
+				rewrite = true;
+				continue;  // Skip writing this entry to the new stage file, effectively removing it
+			}
+			else
+			{
+				stageEntries.push_back(disk);  // Keep this entry for the new stage file
+			}
+		}
+
+		// only rewrite stage file if we found the file to remove, otherwise keep it as is
+		if (rewrite) 
+		{
+			std::ofstream stageFileOut(stageFilePath, std::ios::binary | std::ios::trunc);  // Open in truncate mode to overwrite existing file
+
+			for (const auto& entry : stageEntries) 
+			{
+				stageFileOut.write(reinterpret_cast<const char*>(&entry), sizeof(models::stageEntyDisk));
+			}
+		}
+	
+		updateStage();
 	}
 }

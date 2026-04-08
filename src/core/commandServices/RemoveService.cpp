@@ -8,14 +8,32 @@ namespace rm {
 	{
 		this->fileName = file;
 		this->stageFilePath = utils::getWeaveRoot() / utils::repoNameFromInvocationPath(commandData.invocationPath) / ".weave" / "stage";
+		bool removeTrackingFlagged = false;
+
+		for (const auto& [key, value] : commandData.flags)
+		{
+			if (key == "-t" || key == "--tracked")
+			{
+				removeTrackingFlagged = true;
+				// add manifest removal addition to stage.
+			}
+		}
 
 		if (updateStage())
 		{
 			utils::log("[Remove] INFO | Removed File '" + fileName + "' from staging");
 		}
-		else 
+		else
 		{
-			utils::logError("[Remove] ERROR | File '" + fileName + "' not found in staging");
+			if (!removeTrackingFlagged)
+			{
+				utils::logError("[Remove] ERROR | File '" + fileName + "' not found in staging");
+			}
+		}
+
+		if (removeTrackingFlagged) 
+		{
+			removeTracking(file);
 		}
 
 		return true;
@@ -55,5 +73,26 @@ namespace rm {
 		}
 
 		return found;
+	}
+
+	void rm::RemoveService::removeTracking(const std::string& file) 
+	{
+		std::ofstream stageFile(stageFilePath, std::ios::binary | std::ios::app);
+
+		models::stageEntyDisk disk{};
+
+		std::memcpy(
+			disk.path.data(),
+			fileName.c_str(),
+			std::min(fileName.size(), disk.path.size() - 1)
+		);
+
+		disk.flags = 0; // 1 is add, 0 is delete
+
+		stageFile.write(reinterpret_cast<const char*> (&disk), sizeof(models::stageEntyDisk));
+
+		stageFile.close();
+
+		utils::log("[Remove] INFO | File '" + fileName + "' staged for tracking removal.");
 	}
 }

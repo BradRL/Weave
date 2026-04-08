@@ -6,6 +6,9 @@
 #include "cli/commandHandlers/AddHandler.h"
 #include "cli/commandHandlers/RemoveHandler.h"
 #include "cli/commandHandlers/HelpHandler.h"
+#include "cli/commandHandlers/CommitHandler.h"
+#include "cli/commandHandlers/StageHandler.h"
+#include "cli/CommandHandlers/LogHandler.h"
 
 namespace cli {
 
@@ -17,6 +20,9 @@ namespace cli {
 		commandMap["remove"] = new RemoveHandler();
 		commandMap["rm"] = commandMap["remove"];  // alias for remove command
 		commandMap["help"] = new HelpHandler();
+		commandMap["commit"] = new CommitHandler();
+		commandMap["stage"] = new StageHandler(); 
+		commandMap["log"] = new LogHandler();
 		return commandMap;
 	}
 }

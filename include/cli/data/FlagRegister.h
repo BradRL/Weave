@@ -7,8 +7,9 @@
 namespace cli {
 
 	enum class FlagType {
-		Required,   // Flag must be provided with a value (e.g. `-m "commit message"`)
-		None        // Flag does not take a value (e.g. `--verbose`)
+		Required,    // Flag must be provided with a value (e.g. `-m "commit message"`)
+		None,        // Flag does not take a value (e.g. `--verbose`)
+		Message		 // Flag will combine tokens surrounded by " " into one token
 	};
 
 	struct FlagInfo {
@@ -21,7 +22,9 @@ namespace cli {
 		static std::vector<FlagInfo> flagInfoList = {
 			{"-v", "--verbose", FlagType::None},
 			{"-a", "--author", FlagType::Required},
-			{"-r", "--recursive", FlagType::Required}
+			{"-r", "--recursive", FlagType::None},
+			{"-m", "--message", FlagType::Required},
+			{"-t", "--tracked", FlagType::None}
 		};
 		return flagInfoList;
 	};
