@@ -8,9 +8,11 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <variant>
 #include <filesystem>
 
 #include "core/utils/picosha2.h"
+#include "core/utils/revlogUtils.h"
 
 namespace add {
 
@@ -24,8 +26,10 @@ namespace add {
 		std::filesystem::path indexFilePath;
 		std::filesystem::path dataFilePath;
 		std::filesystem::path stageFilePath;
+		std::filesystem::path revlogPath;
 
-		models::FileIndexEntry fileIndexEntry;
+		revlogUtils::DeltaRevision deltaRevision;
+		models::FileIndexEntryDisk fileIndexEntry;
 
 	private:
 		/// <summary>
@@ -51,6 +55,8 @@ namespace add {
 		/// </summary>
 		void appendRevision();
 
+		void appendRevision2(const std::string& file);
+
 		/// <summary>
 		/// Adds staged file data to staging file, which is used as a temporary storage for files to be commited, until commit is made and stage is cleared. also adds file to revlog files.
 		/// </summary>
@@ -69,5 +75,12 @@ namespace add {
 		/// <param name="file">File name / path</param>
 		/// <returns>if file was found</returns>
 		bool addFile(const std::string& file);
+
+		/// <summary>
+		/// Updated file index staging, uses revlog deltas
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		bool addRevision(const std::string& file);
 	};
 }	

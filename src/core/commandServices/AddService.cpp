@@ -42,7 +42,13 @@ namespace add {
 		resolveRevlogFiles();
 
 		// repo relative path
-		fileIndexEntry.path = fileName;
+		std::memset(fileIndexEntry.path.data(), 0, fileIndexEntry.path.size());
+
+		std::memcpy(
+			fileIndexEntry.path.data(),
+			fileName.data(),
+			std::min(fileName.size(), fileIndexEntry.path.size() - 1)
+		);
 
 		// byte file length
 		fileContents.seekg(0, std::ios::end);
@@ -102,6 +108,7 @@ namespace add {
 		std::filesystem::path revlogPath = utils::getWeaveRoot() / utils::repoNameFromInvocationPath(commandData.invocationPath) / ".weave" / "store" / "data";
 		this->dataFilePath = revlogPath / (fileName + ".d");
 		this->indexFilePath = revlogPath / (fileName + ".i");
+		this->revlogPath = revlogPath;
 		this->stageFilePath = utils::getWeaveRoot() / utils::repoNameFromInvocationPath(commandData.invocationPath) / ".weave" / "stage";
 
 		std::filesystem::create_directories(dataFilePath.parent_path());
@@ -129,12 +136,13 @@ namespace add {
 		// .i
 		models::FileIndexEntryDisk disk{};
 
-		std::memcpy(
+		/*std::memcpy(
 			disk.path.data(),
 			fileIndexEntry.path.c_str(),
 			std::min(fileIndexEntry.path.size(), disk.path.size() - 1)
-		);
-
+		);*/
+		
+		disk.path = fileIndexEntry.path;
 		disk.dataOffset = fileIndexEntry.dataOffset;
 		disk.dataLength = fileIndexEntry.dataLength;
 		disk.nodeID = fileIndexEntry.nodeID;
@@ -152,11 +160,13 @@ namespace add {
 
 		models::stageEntyDisk disk{};
 
-		std::memcpy(
+		/*std::memcpy(
 			disk.path.data(),
 			fileIndexEntry.path.c_str(),
 			std::min(fileIndexEntry.path.size(), disk.path.size() - 1)
-		);
+		);*/
+
+		disk.path = fileIndexEntry.path;
 		disk.nodeID = fileIndexEntry.nodeID;
 		disk.flags = 1; // 1 is add, 0 is delete
 
@@ -233,5 +243,69 @@ namespace add {
 		}
 	
 		updateStage();
+	}
+
+	bool add::AddService::addRevision(const std::string& file)
+	{
+		this->fileName = file;
+
+		if (!validateAddFile()) 
+		{
+			return false;
+		}
+		createStageData();
+
+		if (!hasRevision()) 
+		{
+			this->deltaRevision = revlogUtils::generateDeltas(file, revlogPath, fileIndexEntry.nodeID);
+			appendRevision2(file);
+			utils::log("[Add] INFO | Added File '" + filePath.string() + "' to staging");
+		}
+		tryUpdateStage();
+	}
+
+	void add::AddService::appendRevision2(const std::string& file)
+	{
+		fileIndexEntry.baseRevision = revlogUtils::getRevisionCount(file, revlogPath);
+		if (deltaRevision.useSnapshot) 
+		{
+			std::cout << "Adding SnapShot..." << std::endl;
+			fileIndexEntry.flags = 1;
+			std::ofstream dataFile(dataFilePath, std::ios::app | std::ios::binary);
+
+			std::string snapshotData = revlogUtils::readFile(filePath);
+			fileIndexEntry.dataLength = snapshotData.size();
+			dataFile.write(snapshotData.data(), snapshotData.size());
+			dataFile.close();
+		}
+		else 
+		{
+			std::cout << "Adding Deltas..." << std::endl;
+			fileIndexEntry.flags = 0;
+			std::ofstream dataFile(dataFilePath, std::ios::app | std::ios::binary);
+
+			for (const auto& op : deltaRevision.ops)
+			{
+				if (std::holds_alternative<revlogUtils::EqualOp>(op))
+				{
+					revlogUtils::writeEqualOp(dataFile, std::get<revlogUtils::EqualOp>(op));
+				}
+				else if (std::holds_alternative<revlogUtils::InsertOp>(op))
+				{
+					revlogUtils::writeInsertOp(dataFile, std::get<revlogUtils::InsertOp>(op));
+				}
+			}
+
+			auto end = dataFile.tellp();
+			fileIndexEntry.dataLength = static_cast<uint32_t>(static_cast<uint64_t>(end) - fileIndexEntry.dataOffset);
+			dataFile.close();
+		}
+
+		std::cout << "Index link -> " << fileIndexEntry.baseRevision << " type "<< fileIndexEntry.flags << std::endl;
+		std::ofstream indexFile(indexFilePath, std::ios::binary | std::ios::app);
+
+		indexFile.write(reinterpret_cast<const char*> (&fileIndexEntry), sizeof(models::FileIndexEntryDisk));
+
+		indexFile.close();
 	}
 }

@@ -53,8 +53,6 @@ namespace utils {
 		return configStruct;
 	}
 
-
-
 	std::filesystem::path getWeaveRoot() 
 	{
 		const char* localAppData = std::getenv("LOCALAPPDATA");

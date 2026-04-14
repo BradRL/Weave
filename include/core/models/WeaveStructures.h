@@ -14,6 +14,7 @@ namespace models {
 		std::array<uint8_t, 32> nodeID;
 		uint64_t dataOffset;
 		uint32_t dataLength;
+		uint32_t baseRevision;  // previous revision (will be linear)
 		uint16_t flags;  // fulltext, delta, compression
 	};
 
@@ -24,10 +25,8 @@ namespace models {
 		std::array<uint8_t, 32> nodeID{};
 		uint64_t dataOffset{};
 		uint32_t dataLength{};
-		uint16_t flags{};  // fulltext, delta, compression
-
-		// 302 bytes total
-		// 256 + 32 + 8 + 4 + 2 (removes +2 alignment bytes for arrays) using pack to ensure no padding
+		uint32_t baseRevision{};
+		uint16_t flags{};  // fulltext, delta (1/0)
 	};
 	#pragma pack(pop)
 

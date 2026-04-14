@@ -18,7 +18,8 @@ namespace cli {
 
 		for (const std::string arg : commandData.args) 
 		{
-			addService.addFile(arg);
+			//addService.addFile(arg);
+			addService.addRevision(arg);
 		}
 	}
 
