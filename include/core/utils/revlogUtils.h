@@ -58,13 +58,13 @@ namespace revlogUtils
 		file.write(reinterpret_cast<const char*>(&op.length), sizeof(op.length));
 		file.write(reinterpret_cast<const char*>(&op.offset), sizeof(op.offset));
 
-		std::ostringstream ss;
+		/*std::ostringstream ss;
 		ss << "[Add] DEBUG | Delta[Equals] | Length: " << op.length
 			<< ", Offset: '" << op.offset << "'"
 			<< ", size: " << sizeof(EqualOp);
 
 		std::string logTxt = ss.str();
-		utils::log(logTxt);
+		utils::log(logTxt);*/
 	}
 
 	inline void writeInsertOp(std::ofstream& file, const InsertOp& op)
@@ -74,21 +74,20 @@ namespace revlogUtils
 		file.write(reinterpret_cast<const char*>(&op.length), sizeof(op.length));
 		file.write(reinterpret_cast<const char*>(op.data.data()), op.data.size());
 
-		std::string data(op.data.begin(), op.data.end());
+		/*std::string data(op.data.begin(), op.data.end());
 		std::ostringstream ss;
 		ss << "[Add] DEBUG | Delta[Insert] | Length: " << op.length
 			<< ", Data: '" << data << "'"
 			<< ", size: " << (op.data.size() + 4);
 
 		std::string logTxt = ss.str();
-		utils::log(logTxt);
+		utils::log(logTxt);*/
 	}
 
 	inline std::string applyOps(const std::string& base, const std::vector<DeltaOp>& ops)
 	{
 		std::string result;
-		result.reserve(base.size() * 2);
-
+		result.reserve(base.size() * 2);	
 		for (const auto& op : ops)
 		{
 			if (std::holds_alternative<EqualOp>(op))
@@ -96,14 +95,12 @@ namespace revlogUtils
 				const EqualOp& equalOp = std::get<EqualOp>(op);
 				std::string part = base.substr(equalOp.offset, equalOp.length);
 				result.append(part);
-				std::cout << "ADDED eql '" << part << "'" << std::endl;
 			}
 			else if (std::holds_alternative<InsertOp>(op))
 			{
 				const InsertOp& insertOp = std::get<InsertOp>(op);
 				std::string part(insertOp.data.begin(), insertOp.data.end());
 				result.append(part);
-				std::cout << "ADDED ins '" << part << "'" << std::endl;
 			}
 		}
 		return result;
@@ -187,7 +184,7 @@ namespace revlogUtils
 
 		if (revisions.size() == 0)
 		{
-			std::cout << "No Previous Revision Found for file '" << filePath << std::endl;
+			utils::log("[ADD] DEBUG | No Previous Revision Found for file '" + filePath + "'.");
 			return "";
 		}
 
@@ -196,21 +193,13 @@ namespace revlogUtils
 		// Return full snapshot if flag is set, otherwise reconstruct using deltas
 		if (revisions[targetRevision].flags == 1)
 		{
-			std::cout << "Previous Revision is a Snapshot, no need to apply deltas. '" << targetRevision << "'" << std::endl;
+			utils::log("[ADD] DEBUG | Previous Revision is a Snapshot, no need to apply deltas. '" + filePath + "'");
 			return reconstructSnapshot(revisions[targetRevision], dataFilePath);
 		}
 
 		std::vector<uint32_t> deltaChain;
 		int chainIndex = targetRevision;
 		deltaChain.push_back(chainIndex);
-
-		std::cout << revisions.size() << " total revisions found for file '" << filePath << "'" << std::endl;
-		int a = 0;
-		for (const auto& r : revisions) 
-		{
-			std::cout << "Revision "<< a << " | base: " << r.baseRevision << " | flags: " << r.flags << std::endl;
-			a++;
-		}
 
 		while (revisions[chainIndex].flags != 1)
 		{
@@ -280,7 +269,7 @@ namespace revlogUtils
 		revision.baseRevision = getRevisionCount(filePath, revlogPath);
 		std::string a = reconstructRevision(filePath, revlogPath, hash);
 		std::string b = readFile(filePath);
-		std::cout << "Reconstructed Base Revision: \n'\n" << a << "\n'" << std::endl;
+		//std::cout << "Reconstructed Base Revision: \n'\n" << a << "\n'" << std::endl;
 
 		auto matcher = difflib::MakeSequenceMatcher(a, b);
 		auto opcodes = matcher.get_opcodes();
@@ -310,9 +299,11 @@ namespace revlogUtils
 
 		if (b.size() <= compressedSize)
 		{
+			utils::log("[ADD] DEBUG | Using Snapshot");
 			revision.useSnapshot = true;
 			return revision;
-		}
+		} 
+		utils::log("[ADD] DEBUG | Using Deltas");
 
 		return revision;
 	}

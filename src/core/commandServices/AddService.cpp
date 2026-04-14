@@ -188,7 +188,6 @@ namespace add {
 			if (disk.nodeID == fileIndexEntry.nodeID)
 			{
 				targetFile.close();
-				utils::log("[Add] INFO | File '" + filePath.string() + "' found previous revision");
 				return true;
 			}
 		}
@@ -269,7 +268,6 @@ namespace add {
 		fileIndexEntry.baseRevision = revlogUtils::getRevisionCount(file, revlogPath);
 		if (deltaRevision.useSnapshot) 
 		{
-			std::cout << "Adding SnapShot..." << std::endl;
 			fileIndexEntry.flags = 1;
 			std::ofstream dataFile(dataFilePath, std::ios::app | std::ios::binary);
 
@@ -280,7 +278,6 @@ namespace add {
 		}
 		else 
 		{
-			std::cout << "Adding Deltas..." << std::endl;
 			fileIndexEntry.flags = 0;
 			std::ofstream dataFile(dataFilePath, std::ios::app | std::ios::binary);
 
@@ -301,7 +298,6 @@ namespace add {
 			dataFile.close();
 		}
 
-		std::cout << "Index link -> " << fileIndexEntry.baseRevision << " type "<< fileIndexEntry.flags << std::endl;
 		std::ofstream indexFile(indexFilePath, std::ios::binary | std::ios::app);
 
 		indexFile.write(reinterpret_cast<const char*> (&fileIndexEntry), sizeof(models::FileIndexEntryDisk));
