@@ -80,6 +80,7 @@ namespace add {
 		// Hash generation
 		std::vector<unsigned char> hash(picosha2::k_digest_size);
 		picosha2::hash256(fileContents, hash.begin(), hash.end());
+
 		std::copy(hash.begin(), hash.end(), fileIndexEntry.nodeID.begin());
 
 		std::string hex1 = picosha2::bytes_to_hex_string(hash.begin(), hash.end());
@@ -168,6 +169,7 @@ namespace add {
 
 		disk.path = fileIndexEntry.path;
 		disk.nodeID = fileIndexEntry.nodeID;
+
 		disk.flags = 1; // 1 is add, 0 is delete
 
 		stageFile.write(reinterpret_cast<const char*> (&disk), sizeof(models::stageEntyDisk));
@@ -178,9 +180,6 @@ namespace add {
 	bool add::AddService::hasRevision() const {
 		std::ifstream targetFile(indexFilePath, std::ios::binary);
 
-		if (!targetFile.is_open())
-			return false;
-
 		models::FileIndexEntryDisk disk{};
 
 		while (targetFile.read(reinterpret_cast<char*>(&disk), sizeof(models::FileIndexEntryDisk)))
@@ -188,6 +187,7 @@ namespace add {
 			if (disk.nodeID == fileIndexEntry.nodeID)
 			{
 				targetFile.close();
+				utils::log("[Add] INFO | Linking to duplicate revision found");
 				return true;
 			}
 		}
@@ -260,7 +260,10 @@ namespace add {
 			appendRevision2(file);
 			utils::log("[Add] INFO | Added File '" + filePath.string() + "' to staging");
 		}
+		///
 		tryUpdateStage();
+
+		return true;
 	}
 
 	void add::AddService::appendRevision2(const std::string& file)

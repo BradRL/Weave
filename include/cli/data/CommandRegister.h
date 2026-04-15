@@ -9,6 +9,7 @@
 #include "cli/commandHandlers/CommitHandler.h"
 #include "cli/commandHandlers/StageHandler.h"
 #include "cli/CommandHandlers/LogHandler.h"
+#include "cli/commandHandlers/RollbackHandler.h"
 
 namespace cli {
 
@@ -23,6 +24,7 @@ namespace cli {
 		commandMap["commit"] = new CommitHandler();
 		commandMap["stage"] = new StageHandler(); 
 		commandMap["log"] = new LogHandler();
+		commandMap["rollback"] = new RollbackHandler();
 		return commandMap;
 	}
 }

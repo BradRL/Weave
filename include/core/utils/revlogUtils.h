@@ -184,7 +184,6 @@ namespace revlogUtils
 
 		if (revisions.size() == 0)
 		{
-			utils::log("[ADD] DEBUG | No Previous Revision Found for file '" + filePath + "'.");
 			return "";
 		}
 
@@ -193,7 +192,6 @@ namespace revlogUtils
 		// Return full snapshot if flag is set, otherwise reconstruct using deltas
 		if (revisions[targetRevision].flags == 1)
 		{
-			utils::log("[ADD] DEBUG | Previous Revision is a Snapshot, no need to apply deltas. '" + filePath + "'");
 			return reconstructSnapshot(revisions[targetRevision], dataFilePath);
 		}
 
@@ -299,11 +297,13 @@ namespace revlogUtils
 
 		if (b.size() <= compressedSize)
 		{
-			utils::log("[ADD] DEBUG | Using Snapshot");
+			std::string msg = "[ADD] DEBUG | Using Snapshot '" + std::to_string(b.size()) + " bytes'";
+			utils::log(msg);
 			revision.useSnapshot = true;
 			return revision;
 		} 
-		utils::log("[ADD] DEBUG | Using Deltas");
+		std::string msg = "[ADD] DEBUG | Using Delta '" + std::to_string(compressedSize) + " bytes', saved '" + std::to_string(b.size() - compressedSize) + "'";
+		utils::log(msg);
 
 		return revision;
 	}

@@ -38,7 +38,7 @@ namespace cli {
             std::cout << "  stage      Displays current staged files\n";
             std::cout << "  commit     Commits staged changes to the repository\n";
             std::cout << "  log        Shows commit history\n";
-            std::cout << "  checkout*  Revert working directory to chosen commit\n\n";
+            std::cout << "  checkout   Revert working directory to chosen commit\n\n";
 
             std::cout << "Use `weave help <command>` for detailed information on a specific command.\n";
         }
@@ -73,7 +73,7 @@ namespace cli {
             }
             else if (command == "rm" || command == "remove")
             {
-                std::cout << "Usage: weave rm <file> [file(s)] [flag(s)]\n\n";
+                std::cout << "Usage: weave rm/remove <file> [file(s)] [flag(s)]\n\n";
                 std::cout << "Removes files from staging or repository tracking.\n\n";
 
                 std::cout << "Args:\n";
@@ -95,13 +95,13 @@ namespace cli {
 			}
             else if (command == "commit") 
             {
-                std::cout << "Usage: weave stage [flag(s)]\n\n";
+                std::cout << "Usage: weave commit [flag(s)]\n\n";
 				std::cout << "Commits staged changes to the repository.\n\n";
 				std::cout << "Args:\n";
 				std::cout << "  None.\n\n";
 				std::cout << "Flags:\n";
 				std::cout << "  -v, --verbose        Enables verbose output during commit\n";
-				std::cout << "  -m, --message        Required flag, sets the commit message for this commit, must surround with \"msg\"\n";
+				std::cout << "  -m, --message        Optional flag, sets the commit message for this commit, must surround with \"msg\"\n";
             }
             else if (command == "log")
             {
@@ -112,6 +112,15 @@ namespace cli {
                 std::cout << "Flags:\n";
                 std::cout << "  -v, --verbose        Enables verbose output during log\n";
             }
+            else if (command == "rollback") {
+                std::cout << "Usage: weave rollback [commit number] [flag(s)]\n\n";
+                std::cout << "Reverts working directory to the state of the specified commit. Staging area will be cleared.\n\n";
+                std::cout << "Args:\n";
+                std::cout << "  [commit number]      Optional parameter, specifies which commit to revert to based on `weave log` output.\n\n";
+                std::cout << "                       Default value will be the most recent commit.\n\n";
+                std::cout << "Flags:\n";
+                std::cout << "  -v, --verbose        Enables verbose output during rollback\n";
+			}
             else
             {
                 std::cerr << "[Help] ERROR | No help information found for command '" << command << "'\n";

@@ -55,6 +55,7 @@ namespace commit {
 
 		if (fileSize == 0) {
 			utils::log("[Commit] INFO | This is your first commit.");
+			return;
 		}
 
 		manifestFileIndex.seekg(fileSize - sizeof(models::manifestIndexEntryDisk));  // Move to the last manifest entry
@@ -66,7 +67,7 @@ namespace commit {
 
 		for (uint64_t offset = mDisk.dataOffset; offset < mDisk.dataOffset + mDisk.dataLength; offset += sizeof(models::manifestDataEntryDisk))
 		{
-			manifestFileData.seekg(offset);
+			manifestFileData.seekg(offset, std::ios::beg);
 			models::manifestDataEntryDisk dDisk{};
 			manifestFileData.read(reinterpret_cast<char*>(&dDisk), sizeof(models::manifestDataEntryDisk));
 			manifestEntries.push_back(dDisk);
@@ -142,6 +143,7 @@ namespace commit {
 					else 
 					{
 						manifestEntries[it->second].nodeID = stageEntry.nodeID;  // update manifest with new hash
+
 						utils::log("[Commit] INFO | File '" + resolvedPath + "' updated.");
 						changed = true;
 					}
@@ -160,7 +162,9 @@ namespace commit {
 		std::ofstream manifestFileData(manifestFilePathData, std::ios::binary | std::ios::app);
 		std::ofstream manifestFileIndex(manifestFilePathIndex, std::ios::binary | std::ios::app);
 
+		manifestFileData.seekp(0, std::ios::end);
 		uint64_t dataOffset = manifestFileData.tellp();
+		manifestFileData.seekp(0, std::ios::beg);
 		uint32_t dataLength = manifestEntries.size() * sizeof(models::manifestDataEntryDisk);
 
 		for (const auto& entry : manifestEntries)
