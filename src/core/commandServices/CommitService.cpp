@@ -164,14 +164,22 @@ namespace commit {
 
 		manifestFileData.seekp(0, std::ios::end);
 		uint64_t dataOffset = manifestFileData.tellp();
-		manifestFileData.seekp(0, std::ios::beg);
-		uint32_t dataLength = manifestEntries.size() * sizeof(models::manifestDataEntryDisk);
+		//manifestFileData.seekp(0, std::ios::beg);
+		//uint32_t dataLength = manifestEntries.size() * sizeof(models::manifestDataEntryDisk);
 
+		int writtenCount = 0;
 		for (const auto& entry : manifestEntries)
 		{
-			manifestFileData.write(reinterpret_cast<const char*>(&entry), sizeof(models::manifestDataEntryDisk));
+			if (entry.path[0] != 0) 
+			{
+				std::cout << "Writing manifest entry for file: " << reinterpret_cast<const char*>(entry.path.data()) << std::endl;
+				manifestFileData.write(reinterpret_cast<const char*>(&entry), sizeof(models::manifestDataEntryDisk));
+				writtenCount++;
+			}
 		}
 
+		manifestFileData.seekp(0, std::ios::beg);
+		uint32_t dataLength = writtenCount * sizeof(models::manifestDataEntryDisk);
 		models::manifestIndexEntryDisk indexEntry{};
 
 		indexEntry.dataOffset = dataOffset;
